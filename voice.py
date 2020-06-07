@@ -232,8 +232,6 @@ def play_video(name_of_video):
             # Display the resulting frame
             cv2.imshow('Frame', frame)
 
-            
-            
             if ui.button2.isChecked():
                 stop_song()
                 end_of_process()

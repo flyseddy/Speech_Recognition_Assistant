@@ -256,9 +256,7 @@ def end_of_process():
     ui.label1.setHidden(False)
     ui.button1.setEnabled(True)
     ui.button2.setCheckable(False)
-    ui.button2.setEnabled(False)
-    
-       
+    ui.button2.setEnabled(False)   
 
 if __name__ == "__main__":
     import sys

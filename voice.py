@@ -16,6 +16,9 @@ import time
 from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5.QtGui import QIcon, QMovie
+from jokes import mainJokes
+
+
 
 
 class Ui_MainWindow(object):
@@ -169,6 +172,7 @@ def process_text_tokenize(processed_text):
 
 def process_text(text):
     global p
+    num = 1
     if 'romantic' in text and 'mode' in text:
         t1 = threading.Thread(target=play_video, args=('videos/fireplace_new',))
         p = Process(target=playsound, args=('songs/romantic.mp3',))
@@ -176,8 +180,8 @@ def process_text(text):
         t1.start()
     elif 'father' in text or 'daddy' in text:
         tts = gTTS('You are my creator and I love you!', lang='en')
-        tts.save('hey.mp3')
-        playsound('hey.mp3')
+        tts.save(f'{num}.mp3')
+        playsound(f'{num}.mp3')
         os.remove('hey.mp3')
         end_of_process()
     elif 'spotify' in text:
@@ -188,6 +192,14 @@ def process_text(text):
         p = Process(target=playsound, args=('songs/sad_song_song.mp3',))
         p.start()
         t1.start()
+    elif 'tell me a joke' in text or 'joke' in text:
+        # Creates instance of joke object
+        random_joke = mainJokes()
+        tts = gTTS(random_joke, lang='en')
+        tts.save('joke.mp3')
+        playsound('joke.mp3')
+        os.remove('joke.mp3')
+        end_of_process()
     else:
         dont_recognize_command()
         time.sleep(1)
@@ -260,6 +272,27 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
+    style = """
+        QWidget{
+            background: #000000;
+        }
+        QLabel{
+            color: #fff;
+            font-weight:bold;
+
+        }
+        QPushButton{
+            color: white;
+            background: #9a05a8;
+            border: 1px #DADADA solid;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 9pt;
+            outline: none;
+        }
+    """
+    app.setStyleSheet(style)
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
     MainWindow.show()

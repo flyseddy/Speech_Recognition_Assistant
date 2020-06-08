@@ -17,6 +17,7 @@ from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5.QtGui import QIcon, QMovie
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -104,8 +105,6 @@ class Ui_MainWindow(object):
         
     # Speak Button Clicked method
     def clicked(self):
-        # Enables the "end" button to kill the process
-        self.button2.setEnabled(True)
         microphone_input()
         self.button2.setCheckable(True)
         self.update()
@@ -121,9 +120,15 @@ class Ui_MainWindow(object):
     def update(self):
         self.label1.adjustSize()
 
-
     # Same as end process
     def end_task(self, text):
+        # Ends the music process if activated since it's a background process
+        try:
+            if p:
+                stop_song()
+                print('Song closed')
+        except NameError:
+            pass
         time.sleep(.2)
         self.setLabel(text)
         self.button2.setEnabled(False)
@@ -131,33 +136,28 @@ class Ui_MainWindow(object):
         
 def microphone_input():
     """ Process the Microphone input and tokenizes it"""
-    # Turns speak button off while processing to prevent spam clicking
+    # Turns speak and end button off while processing to prevent spam clicking and abnormal processes
     ui.button1.setEnabled(False)
+    ui.button2.setEnabled(False)
 
     # Obtain audio from the microphone
     r = sr.Recognizer()
     with sr.Microphone() as source:
         audio = r.listen(source)
     try:
-        # Return nothing when end button is checked
-        if ui.button2.isChecked():
-            return None
         sentence = r.recognize_google(audio).lower()
         process_text_tokenize(sentence)
     except sr.UnknownValueError:
-        # Return nothing when end button is checked
-        if ui.button2.isChecked():
-            return None
-        # print("Google Speech Recognition could not understand audio")
+        # Couldn't recognize command
         dont_recognize_command()
-        sys.exit()
+        time.sleep(1)
+        end_of_process()
     except sr.RequestError as e:
         print("Could not request results from Speech Recognition service; {0}".format(e))
 
 # this method filters the incoming sentence to get rid of stop words
 def process_text_tokenize(processed_text):
     stop_words = set(stopwords.words('english'))
-
     words_tokens = word_tokenize(processed_text)
     # Empty list
     filtered_sentence = []
@@ -165,15 +165,16 @@ def process_text_tokenize(processed_text):
         if w not in stop_words:
             filtered_sentence.append(w)
     process_text(filtered_sentence)
+    
 
 def process_text(text):
-    global romantic
-    if 'romantic' in text:
-        threading.Thread(target=play_video, args=('videos/fireplace',)).start()
-        # romantic = Process(target=play_video, args=('fireplace',))
-        #romantic.start()
-        start_playback_song('coffee')
-    elif 'father' in text:
+    global p
+    if 'romantic' in text and 'mode' in text:
+        t1 = threading.Thread(target=play_video, args=('videos/fireplace_new',))
+        p = Process(target=playsound, args=('songs/romantic.mp3',))
+        p.start()
+        t1.start()
+    elif 'father' in text or 'daddy' in text:
         tts = gTTS('You are my creator and I love you!', lang='en')
         tts.save('hey.mp3')
         playsound('hey.mp3')
@@ -183,10 +184,14 @@ def process_text(text):
         subprocess.Popen('C:\\Users\\serdr\\AppData\\Roaming\\Spotify\\Spotify.exe')
         end_of_process()
     elif 'sad' in text:
-        threading.Thread(target=play_video, args=('videos/sad_song',)).start()
-        start_playback_song('505')
+        t1 = threading.Thread(target=play_video, args=('videos/sad_song_new',))
+        p = Process(target=playsound, args=('songs/sad_song_song.mp3',))
+        p.start()
+        t1.start()
     else:
         dont_recognize_command()
+        time.sleep(1)
+        end_of_process()
         
 def dont_recognize_command():
     ui.button2.setEnabled(False)
@@ -196,15 +201,6 @@ def dont_recognize_command():
 # Sets button2 to false (it cant be triggered)
 def set_button2_false():
     ui.button2.setEnabled(False)
-
-def start_playback_song(name_of_song):
-    # Make a global variable so any method can access this object
-    global p
-    p = Process(target=playsound, args=(f'songs/{name_of_song}.mp3',))
-    play_song()
-
-def play_song():
-    p.start()
 
 def stop_song():
     p.terminate()
@@ -223,6 +219,7 @@ def play_video(name_of_video):
     # Read until the video is completed
     
     while(cap.isOpened()):
+        ui.button2.setEnabled(True)
         ui.button1.setEnabled(False)
         # ui.button1.setEnabled(False) # Wont allow button to be pressed while video is opened
         # Capture frame by frame
@@ -233,8 +230,6 @@ def play_video(name_of_video):
             cv2.imshow('Frame', frame)
 
             if ui.button2.isChecked():
-                stop_song()
-                end_of_process()
                 break
             
             # Press Q on keyboard to exit
@@ -246,9 +241,12 @@ def play_video(name_of_video):
     # When everything is done, release the video capture object
     cap.release()
     # Closes all the frames
-    cv2.destroyAllWindows()
-    stop_song()
+    cv2.destroyAllWindows() 
+    if p:
+        stop_song()
+        print('Song closed')
     end_of_process()
+
 
 def end_of_process():
     # ui.label2.setHidden(False)
@@ -261,25 +259,6 @@ def end_of_process():
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    style = """
-        QWidget{
-            background: #000000;
-        }
-        QLabel{
-            color: #fff;
-        }
-        QPushButton{
-            color: white;
-            background: #9a05a8;
-            border: 1px #DADADA solid;
-            padding: 5px 10px;
-            border-radius: 2px;
-            font-weight: bold;
-            font-size: 9pt;
-            outline: none;
-        }
-    """
-    app.setStyleSheet(style)
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)

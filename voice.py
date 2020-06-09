@@ -277,6 +277,11 @@ def process_weather(text):
         final_list = new_list[-1:]
         string_city = final_list.pop()
         weather = find_weather(string_city)
+        if weather == None:
+            dont_recognize_command()
+            time.sleep(1)
+            end_of_process()
+            sys.exit()
         formatted_weather = f"{weather} degrees fahrenheit" 
         return formatted_weather
     else:
@@ -285,6 +290,11 @@ def process_weather(text):
         word_2 = new_list.pop(-1)
         string_city = f"{word_1} {word_2}"
         weather = find_weather(string_city)
+        if weather == None:
+            dont_recognize_command()
+            time.sleep(1)
+            end_of_process()
+            sys.exit()
         formatted_weather = f"{weather} degrees fahrenheit"
         return formatted_weather
 

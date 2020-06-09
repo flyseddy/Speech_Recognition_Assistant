@@ -171,6 +171,7 @@ def process_text_tokenize(processed_text):
     
 
 def process_text(text):
+    """Commands go here in the if and else statements"""
     global p
     num = 1
     if 'romantic' in text and 'mode' in text:

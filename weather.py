@@ -1,6 +1,8 @@
 import requests, json
 from secrets import weather_api_key
 
+
+
 def find_weather(city):
 
     # API Key for Khaleesi
@@ -36,6 +38,9 @@ def find_weather(city):
         rounded_temp = round(convert_temp)
         return rounded_temp
     else:
-        print("City not found")
+        # Cant find city
+        return None
+        
+        
 
 

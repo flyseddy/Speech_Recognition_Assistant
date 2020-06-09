@@ -1,4 +1,4 @@
-
+import getpass 
 from PyQt5 import QtCore, QtGui, QtWidgets
 import subprocess
 import speech_recognition as sr 
@@ -17,9 +17,10 @@ from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5.QtGui import QIcon, QMovie
 from jokes import mainJokes
+from weather import find_weather
 
-
-
+# Stores the current windows username to access files on system
+user = getpass.getuser()
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -51,9 +52,7 @@ class Ui_MainWindow(object):
         self.label2.setHidden(True)
 
         self.gif = QMovie('loading_gif/loading.gif')
-        # self.label2.setMovie(self.gif)
-        
-
+    
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 233, 20))
@@ -138,6 +137,7 @@ class Ui_MainWindow(object):
         self.button1.setEnabled(True)
         
 def microphone_input():
+    
     """ Process the Microphone input and tokenizes it"""
     # Turns speak and end button off while processing to prevent spam clicking and abnormal processes
     ui.button1.setEnabled(False)
@@ -169,7 +169,6 @@ def process_text_tokenize(processed_text):
             filtered_sentence.append(w)
     process_text(filtered_sentence)
     
-
 def process_text(text):
     """Commands go here in the if and else statements"""
     global p
@@ -186,8 +185,13 @@ def process_text(text):
         os.remove('hey.mp3')
         end_of_process()
     elif 'spotify' in text:
-        subprocess.Popen('C:\\Users\\serdr\\AppData\\Roaming\\Spotify\\Spotify.exe')
-        end_of_process()
+        try:
+            subprocess.Popen(f'C:\\Users\\{user}\\AppData\\Roaming\\Spotify\\Spotify.exe')
+            end_of_process()
+        except FileNotFoundError:
+            ui.setLabel('File Not Found')
+            time.sleep(1)
+            end_of_process()
     elif 'sad' in text:
         t1 = threading.Thread(target=play_video, args=('videos/sad_song_new',))
         p = Process(target=playsound, args=('songs/sad_song_song.mp3',))
@@ -201,6 +205,12 @@ def process_text(text):
         playsound('joke.mp3')
         os.remove('joke.mp3')
         end_of_process()
+    elif 'weather' in text:
+        tts = gTTS(process_weather(text), lang='en')
+        tts.save('weather.mp3')
+        playsound('weather.mp3')
+        os.remove('weather.mp3')
+        end_of_process()         
     else:
         dont_recognize_command()
         time.sleep(1)
@@ -259,6 +269,24 @@ def play_video(name_of_video):
         stop_song()
         print('Song closed')
     end_of_process()
+
+# method to process weather requests using openweathermap API
+def process_weather(text):
+    new_list = text[-2:]
+    if 'weather' in new_list:
+        final_list = new_list[-1:]
+        string_city = final_list.pop()
+        weather = find_weather(string_city)
+        formatted_weather = f"{weather} degrees fahrenheit" 
+        return formatted_weather
+    else:
+        # pops the last 2 words out and concatenates them
+        word_1 = new_list.pop(-2)
+        word_2 = new_list.pop(-1)
+        string_city = f"{word_1} {word_2}"
+        weather = find_weather(string_city)
+        formatted_weather = f"{weather} degrees fahrenheit"
+        return formatted_weather
 
 
 def end_of_process():

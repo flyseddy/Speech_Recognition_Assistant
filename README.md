@@ -1,6 +1,7 @@
 # Khaleesi (Voice Assistant)
 
 Khaleesi is a simple personalized speech recognition assistant for your desktop that can be used to automate various processes.
+
 ![](demo.gif)
 
 #### Features

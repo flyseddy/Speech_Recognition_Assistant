@@ -1,0 +1,11 @@
+**COMMANDS** Its triggered by keywords and only recognizes the following commands with a little bit of leniency thanks to NLP. (Will be adding more soon)
+__________________________________________________________________________________________________________________________
+
+Current Commands (Will be adding more soon. Send me some ideas too for some commands :)
+* 'enter romantic mode'
+* 'Who is your father'
+* 'who is your mother'
+*  'open spotify'
+* 'enter sad mode'
+* 'tell me a joke' (randomized: new joke each time)
+* 'whats the weather in (city)'

@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5.QtGui import QIcon, QMovie
 from jokes import mainJokes
 from weather import find_weather
+from response import father, mother
 
 # Stores the current windows username to access files on system
 user = getpass.getuser()
@@ -89,7 +90,6 @@ class Ui_MainWindow(object):
         self.label2.setMovie(self.gif)
         self.gif.start()
         time.sleep(.2)
-       # self.setLabel(text)
         threading.Thread(target=self.clicked).start()
     
     # Close method that kills all proccesses when user clicks red x in upper right hand corner
@@ -97,12 +97,10 @@ class Ui_MainWindow(object):
         try:
             if p:
                 stop_song()
-                print("Window Closed")
                 os._exit(0)
         except NameError:
             pass
         else:
-            print("Window Closed")
             os._exit(0)
         
     # Speak Button Clicked method
@@ -128,7 +126,6 @@ class Ui_MainWindow(object):
         try:
             if p:
                 stop_song()
-                print('Song closed')
         except NameError:
             pass
         time.sleep(.2)
@@ -156,13 +153,13 @@ def microphone_input():
         time.sleep(1)
         end_of_process()
     except sr.RequestError as e:
-        print("Could not request results from Speech Recognition service; {0}".format(e))
+        ui.setLabel('Error')
 
 # this method filters the incoming sentence to get rid of stop words
 def process_text_tokenize(processed_text):
     stop_words = set(stopwords.words('english'))
     words_tokens = word_tokenize(processed_text)
-    # Empty list
+    # Empty list which will contain filtered tokens
     filtered_sentence = []
     for w in words_tokens:
         if w not in stop_words:
@@ -172,17 +169,24 @@ def process_text_tokenize(processed_text):
 def process_text(text):
     """Commands go here in the if and else statements"""
     global p
-    num = 1
     if 'romantic' in text and 'mode' in text:
         t1 = threading.Thread(target=play_video, args=('videos/fireplace_new',))
         p = Process(target=playsound, args=('songs/romantic.mp3',))
         p.start()
         t1.start()
-    elif 'father' in text or 'daddy' in text:
-        tts = gTTS('You are my creator and I love you!', lang='en')
-        tts.save(f'{num}.mp3')
-        playsound(f'{num}.mp3')
-        os.remove('hey.mp3')
+    elif 'father' in text or 'daddy' in text or 'dad' in text or 'creator' in text:
+        dad_response = father()
+        tts = gTTS(dad_response, lang='en')
+        tts.save('dad.mp3')
+        playsound('dad.mp3')
+        os.remove('dad.mp3')
+        end_of_process()
+    elif 'mother' in text or 'mom' in text or 'mommy' in text:
+        mom_response = mother()
+        tts = gTTS(mom_response, lang='en')
+        tts.save('mom.mp3')
+        playsound('mom.mp3')
+        os.remove('mom.mp3')
         end_of_process()
     elif 'spotify' in text:
         try:
@@ -197,7 +201,7 @@ def process_text(text):
         p = Process(target=playsound, args=('songs/sad_song_song.mp3',))
         p.start()
         t1.start()
-    elif 'tell me a joke' in text or 'joke' in text:
+    elif 'joke' in text:
         # Creates instance of joke object
         random_joke = mainJokes()
         tts = gTTS(random_joke, lang='en')
@@ -221,10 +225,6 @@ def dont_recognize_command():
     ui.button1.setEnabled(True)
     ui.setLabel("Couldn't recognize command")
 
-# Sets button2 to false (it cant be triggered)
-def set_button2_false():
-    ui.button2.setEnabled(False)
-
 def stop_song():
     p.terminate()
 
@@ -235,22 +235,17 @@ def play_video(name_of_video):
     # Check if camera opened successfully
     if (cap.isOpened()==False):
         setLabel('Error Opening video file')
-    
-    cv2.namedWindow('Window', cv2.WND_PROP_FULLSCREEN)
-    cv2.setWindowProperty('Window', cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
-
     # Read until the video is completed
-    
     while(cap.isOpened()):
         ui.button2.setEnabled(True)
+        # Wont allow button to be pressed while video is opened
         ui.button1.setEnabled(False)
-        # ui.button1.setEnabled(False) # Wont allow button to be pressed while video is opened
         # Capture frame by frame
         ret, frame = cap.read()
         if ret == True:
 
             # Display the resulting frame
-            cv2.imshow('Frame', frame)
+            cv2.imshow('Show', frame)
 
             if ui.button2.isChecked():
                 break
@@ -267,7 +262,6 @@ def play_video(name_of_video):
     cv2.destroyAllWindows() 
     if p:
         stop_song()
-        print('Song closed')
     end_of_process()
 
 # method to process weather requests using openweathermap API
@@ -298,9 +292,8 @@ def process_weather(text):
         formatted_weather = f"{weather} degrees fahrenheit"
         return formatted_weather
 
-
+# Method to handle end processes
 def end_of_process():
-    # ui.label2.setHidden(False)
     ui.setLabel('Say Something')
     ui.label1.setHidden(False)
     ui.button1.setEnabled(True)

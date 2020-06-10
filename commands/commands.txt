@@ -3,8 +3,8 @@ ________________________________________________________________________________
 
 Current Commands (Will be adding more soon. Send me some ideas too for some commands :)
 * 'enter romantic mode'
-* 'Who is your father'
-* 'who is your mother'
+* 'Who is your father'(randomized)
+* 'who is your mother' (randomized)
 *  'open spotify'
 * 'enter sad mode'
 * 'tell me a joke' (randomized: new joke each time)

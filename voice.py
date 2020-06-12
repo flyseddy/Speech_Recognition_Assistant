@@ -20,6 +20,8 @@ from jokes import mainJokes
 from weather import find_weather
 from response import father, mother
 
+sys.setrecursionlimit(100000)
+
 # Stores the current windows username to access files on system
 user = getpass.getuser()
 

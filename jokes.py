@@ -7,7 +7,7 @@ def mainJokes():
     r = requests.get(url)
 
     soup = BeautifulSoup(r.text, 'html.parser')
-
+    # This is the bug (containers is empty [] - will need to scrape again)
     containers = soup.find_all(class_='article__content article__content--dropcap')
 
     all_paragraph_tags = []

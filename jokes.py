@@ -1,10 +1,13 @@
 from bs4 import BeautifulSoup
 import requests
 import random
+import pandas as pd
 
 def mainJokes():
+    """This method scrapes jokes from the website below and writes it to an excel file using Pandas"""
     url = 'https://www.fatherly.com/play/corny-jokes-to-tell-kids-you-love-and-adults-you-hate'
-    r = requests.get(url)
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.106 Safari/537.36'}
+    r = requests.get(url, headers=headers)
 
     soup = BeautifulSoup(r.text, 'html.parser')
     # This is the bug (containers is empty [] - will need to scrape again)
@@ -49,16 +52,24 @@ def mainJokes():
         # Replaces the number in front of the joke with blank space
         final_joke_list = []
         for i in range(len(list_of_jokes)):
-            final_joke = list_of_jokes[i].replace(f'{i + 1}.', '').replace('"', '')
+            final_joke = list_of_jokes[i].replace(f'{i + 1}.', '').replace('"', '').replace('\xa0', '')
             final_joke_list.append(final_joke)
         
-        # Deletes last 6 jokes because of bug that would'nt let me delete #s attached
-        del final_joke_list[-6:]
+        # Deletes last 12 jokes because of bug that would'nt let me delete #s attached
+        del final_joke_list[-12:]
+        del final_joke_list[48]
 
-        random_joke = random.choice(final_joke_list)
-        return random_joke
+        # Dictionary to contain the final joke list
+        jokes_csv = {
+            'joke': final_joke_list
+        }
+
+        df = pd.DataFrame(jokes_csv)
+        df.to_csv('jokes.csv')
+
+
+mainJokes()
         
-
 
     
 

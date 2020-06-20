@@ -55,7 +55,7 @@ def mainJokes():
             final_joke = list_of_jokes[i].replace(f'{i + 1}.', '').replace('"', '').replace('\xa0', '')
             final_joke_list.append(final_joke)
         
-        # Deletes last 12 jokes because of bug that would'nt let me delete #s attached
+        # Deletes last 12 jokes because of bug that wouldn't let me delete #s attached
         del final_joke_list[-12:]
         del final_joke_list[48]
 

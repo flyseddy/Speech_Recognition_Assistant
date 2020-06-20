@@ -16,7 +16,7 @@ import time
 from multiprocessing import Process
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel
 from PyQt5.QtGui import QIcon, QMovie
-from jokes import mainJokes
+from test_joke import test_joke
 from weather import find_weather
 from response import father, mother
 
@@ -205,7 +205,7 @@ def process_text(text):
         t1.start()
     elif 'joke' in text:
         # Creates instance of joke object
-        random_joke = mainJokes()
+        random_joke = test_joke()
         tts = gTTS(random_joke, lang='en')
         tts.save('joke.mp3')
         playsound('joke.mp3')

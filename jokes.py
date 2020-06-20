@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
-import random
 import pandas as pd
+import random
 
 def mainJokes():
     """This method scrapes jokes from the website below and writes it to an excel file using Pandas"""
@@ -59,13 +59,18 @@ def mainJokes():
         del final_joke_list[-12:]
         del final_joke_list[48]
 
+        print(random.choice(final_joke_list))
+
+        # Uncomment docstring to write to jokes_csv file
+        """
         # Dictionary to contain the final joke list
         jokes_csv = {
             'joke': final_joke_list
         }
 
         df = pd.DataFrame(jokes_csv)
-        df.to_csv('jokes.csv')
+        df.to_csv('jokes.csv', index=False)
+        """
 
 
 mainJokes()
